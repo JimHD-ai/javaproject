@@ -1,6 +1,8 @@
 package core;
 
 public class Main {
-    public static void main(String[] args) { System.out.println("fuck you .|. ");
+    public static void main(String[] args) {
+        Controller controller = new Controller();
+        controller.begin();
     }
 }
