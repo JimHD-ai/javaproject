@@ -25,4 +25,7 @@ public class Customer {
 
     public String getAFM(){ return afm ; }
     public String getID() { return id; }
+    public String getAddress(){return address;}
+    public String getJobStatus(){return jobStatus;}
+    public String getEmail(){return email;}
 }
