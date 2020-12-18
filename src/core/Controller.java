@@ -1,24 +1,23 @@
 package core;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Scanner;
 
 public class Controller {
-    private ArrayList<Customer> customers;
+    public ArrayList<Customer> customers;
 
     public Controller(){
         customers = new ArrayList<>();
     }
 
-    public void begin(){
+    public boolean begin(){
         System.out.println("Welcome to JavaPhone Telecom");
-
         customerLogin();
+        return true;
     }
-    //TODO cache user input, use control to not lose data, only current invalid input
-    private void customerLogin(){
-        boolean loginStatus = true;
 
+    private void customerLogin(){
         String afm="";
         String id="";
         String address="";
@@ -47,7 +46,6 @@ public class Controller {
                     id = "";
                     System.out.println("Error ID already exist");
                     break;
-
                 }
             }
         }
@@ -58,33 +56,27 @@ public class Controller {
         do {
             System.out.print(" Please choose your Job Status among the following choices : \n 1. Private Citizen \n 2. Student \n 3. Professional \n");
             int y = Integer.parseInt(scanner.nextLine());
-            switch  (y) {
-                case 1:
-                    jobStatus = "Private Citizen";
-
-                    break;
-                case 2:
-                    jobStatus = "Student";
-                    break;
-                case 3:
-                    jobStatus = "Professional";
-                    break;
-
-                default:
-                    System.out.println("Sorry, please enter valid Option");
-
-
+            switch (y) {
+                case 1 -> jobStatus = "Private Citizen";
+                case 2 -> jobStatus = "Student";
+                case 3 -> jobStatus = "Professional";
+                default -> System.out.println("Sorry, please enter valid Option");
             }
         }while (jobStatus == "");
 
 
         System.out.print("Please write your Email: ");
         email = scanner.nextLine();
+        customers.add(new Customer(afm, id, address, jobStatus, email));
+    }
 
-
-
-
-        if (loginStatus)
-            customers.add(new Customer(afm, id, address, jobStatus, email));
+    public boolean verifyListIntegrity(){
+        HashSet<String> afms = new HashSet<>();
+        HashSet<String> ids = new HashSet<>();
+        for (Customer c : customers){
+            if( !afms.add(c.getAFM()) || !ids.add(c.getAFM()) )
+                return false;
+        }
+        return true;
     }
 }

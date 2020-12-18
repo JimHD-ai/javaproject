@@ -3,6 +3,7 @@ package core;
 import java.util.ArrayList;
 
 public class Customer {
+
     private String afm;
     private String id;
     private String address;
@@ -10,10 +11,6 @@ public class Customer {
     private String email;
 
     private ArrayList<Contract> contracts;
-
-    public Customer(){
-
-    }
 
     public Customer(String afm, String id, String address, String jobStatus, String email) {
         this.afm = afm;
@@ -28,4 +25,7 @@ public class Customer {
     public String getAddress(){return address;}
     public String getJobStatus(){return jobStatus;}
     public String getEmail(){return email;}
+    public void print(){
+        System.out.println(afm + " " + id + " " + address + " " + jobStatus + " " + email);
+    }
 }
