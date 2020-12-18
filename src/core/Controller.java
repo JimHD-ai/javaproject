@@ -33,7 +33,6 @@ public class Controller {
                     afm = "";
                     System.out.println("Error AFM already exist");
                     break;
-
                 }
             }
         }
