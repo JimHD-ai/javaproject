@@ -10,7 +10,7 @@ public class Customer {
     private String jobStatus;
     private String email;
 
-    private ArrayList<Contract> contracts;
+    private final ArrayList<Contract> contracts;
 
     public Customer(String afm, String id, String address, String jobStatus, String email) {
         this.afm = afm;
@@ -18,6 +18,8 @@ public class Customer {
         this.address = address;
         this.jobStatus = jobStatus;
         this.email = email;
+
+        contracts = new ArrayList<>();
     }
 
     public String getAFM(){ return afm ; }
@@ -28,4 +30,7 @@ public class Customer {
     public void print(){
         System.out.println(afm + " " + id + " " + address + " " + jobStatus + " " + email);
     }
+
+    public ArrayList<Contract> getContracts() { return contracts; }
+    public void addContract(Contract contract) { contracts.add(contract); }
 }
