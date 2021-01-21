@@ -14,12 +14,8 @@ public class MobileContract extends Contract {
     public double calculateCost() {
         double cost = 0.54 * freeCallMinutes / 3;
         cost += 0.23 * freeSMS / 2;
-        if (paymentType == PaymentType.CREDITCARD) //convenience fee
-            cost++;
-        if (contractDuration == 24) //2% reduction for loyal customers
-            cost = 0.98 * cost;
 
-        return cost;
+        return (cost/100) * 100-discount;
     }
 
     @Override
@@ -69,8 +65,9 @@ public class MobileContract extends Contract {
                         Electronic: %b
                         Payment method: %s
                         Monthly Cost: %.2f€
+                        Discount: %d%%
                         %n""", contractId, phoneNumber, customerID, customerAFM,
                 type, freeCallMinutes, freeData, freeSMS, startDate.toString(), endDate.toString(),
-                electronic, paymentType, monthlyCost);
+                electronic, paymentType, monthlyCost, discount);
     }
 }

@@ -1,6 +1,8 @@
 package core;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.stream.Collectors;
 
 public class Customer {
 
@@ -33,4 +35,16 @@ public class Customer {
 
     public ArrayList<Contract> getContracts() { return contracts; }
     public void addContract(Contract contract) { contracts.add(contract); }
+
+    /*
+        Returns an ArrayList with the currently active contracts
+        A contract is active if its start date is before the current local date
+        that the program is running
+    */
+    public ArrayList<Contract> getActiveContracts() {
+        return contracts.stream()
+                .filter(c -> c.startDate.isBefore(LocalDate.now()))
+                .collect(Collectors.toCollection(ArrayList::new));
+    }
+
 }

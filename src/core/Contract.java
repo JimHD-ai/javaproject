@@ -23,6 +23,8 @@ public abstract class Contract {
 
     protected boolean internetConnection;
 
+    protected int discount;
+
     public abstract double calculateCost();
 
     public abstract Contract build(Customer customer);
@@ -125,7 +127,7 @@ public abstract class Contract {
                 """);
         tempInput = scanner.nextLine();
         internetConnection = tempInput.equals("1");
-
+        calculateDiscount(customer);
         return true;
     }
 
@@ -151,11 +153,43 @@ public abstract class Contract {
     }
 
     public abstract void printContract();
-    public void printCondensed(){
-        System.out.println(
-                "\nPhone number: "+phoneNumber +
-                "\nContract type: "+type +
-                "\nSTART DATE" + startDate.toString()+
-                "\nEND DATE" + endDate.toString());
+
+    public void printCondensed() {
+        System.out.println("\nPhone number: " + phoneNumber +
+                        "\nContract type: " + type +
+                        "\nSTART DATE " + startDate.toString() +
+                        "\nEND DATE " + endDate.toString());
+    }
+
+    public double getMonthlyCost() {
+        return monthlyCost;
+    }
+
+    public void calculateDiscount(Customer customer) {
+        discount = 0;
+        ArrayList<Contract> activeContracts = customer.getActiveContracts();
+        //JOB STATUS
+        if (customer.getJobStatus().equals("Private Citizen"))
+            discount += 5 * activeContracts.size();
+        else if (customer.getJobStatus().equals("Professional"))
+            discount += 10 * activeContracts.size();
+        else
+            discount += 15 * activeContracts.size();
+
+        //Check if any contract above 1000 minutes and depending on type
+        if (customer.getContracts().stream().anyMatch(c -> c.freeCallMinutes >= 1000))
+            if (type == ContractType.HOME)
+                discount += 8;
+            else
+                discount += 11;
+        if (paymentType == PaymentType.CREDITCARD || paymentType == PaymentType.STANDING_ORDER)
+            discount += 5;
+
+        //If account is electronic
+        if (electronic)
+            discount += 2;
+
+        //Limit the max value of discount at 45
+        discount = Math.min(discount, 45);
     }
 }

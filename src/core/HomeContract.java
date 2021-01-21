@@ -13,11 +13,8 @@ public class HomeContract extends Contract {
     public double calculateCost() {
         double cost = 0.45 * freeCallMinutes / 3;
         cost += connectionSpeed.equals("ADSL") ? 18.69 : 31.9; //taken straight from COSMOTE
-        if (paymentType == PaymentType.CREDITCARD) //convenience fee
-            cost++;
-        if (contractDuration == 24) //2% reduction for loyal customers
-            cost = 0.98 * cost;
-        return cost;
+
+        return (cost/100) * 100-discount;
     }
 
     @Override
@@ -57,8 +54,9 @@ public class HomeContract extends Contract {
                 Electronic: %b
                 Payment method: %s
                 Monthly Cost: %.2f€
+                Discount: %d%%
                 %n""",contractId, phoneNumber, customerID, customerAFM,
                 type,freeCallMinutes, internetConnection, startDate.toString(), endDate.toString(),
-                electronic, paymentType, monthlyCost);
+                electronic, paymentType, monthlyCost,discount);
     }
 }

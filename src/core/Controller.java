@@ -1,6 +1,7 @@
 package core;
 
 import java.util.ArrayList;
+
 import java.util.Scanner;
 
 public class Controller {
@@ -8,25 +9,26 @@ public class Controller {
 
     private Customer currentCustomer;
 
-    public Controller(){
+    public Controller() {
         customers = new ArrayList<>();
     }
 
-    public void begin(){
+    public void begin() {
         currentCustomer = new Customer("FA89", "AI816966", "Sapfous 11", "Student", "shadehater@hotmail.com");
+        customers.add(currentCustomer);
         Scanner scanner = new Scanner(System.in);
         System.out.println("Welcome to JavaPhone Telecom");
 
         int choice = -1;
-        do{
-        System.out.println("""
-                Please enter the number corresponding to the actions below:
-                1) Customer Log In
-                2) New Contract
-                3) Delete Contract
-                4) Show Active Contracts & Statistics
-                5) exit
-                """);
+        do {
+            System.out.println("""
+                    Please enter the number corresponding to the actions below:
+                    1) Customer Log In
+                    2) New Contract
+                    3) Delete Contract
+                    4) Show Active Contracts & Statistics
+                    5) exit
+                    """);
             choice = Integer.parseInt(scanner.nextLine());
             if (choice == 1)
                 customerLogin();
@@ -35,7 +37,7 @@ public class Controller {
             else if (choice == 3)
                 deleteContract();
             else if (choice == 4)
-                return;
+                showStatistics();
 
             System.out.println("------------------------------------------------------------");
         }
@@ -44,12 +46,12 @@ public class Controller {
         System.out.println("Thank you for using our system");
     }
 
-    private void customerLogin(){
-        String afm="";
-        String id="";
-        String address="";
-        String jobStatus="";
-        String email="";
+    private void customerLogin() {
+        String afm = "";
+        String id = "";
+        String address = "";
+        String jobStatus = "";
+        String email = "";
 
         Scanner scanner = new Scanner(System.in);
         while (afm.equals("")) {
@@ -88,13 +90,13 @@ public class Controller {
                 case 3 -> jobStatus = "Professional";
                 default -> System.out.println("Sorry, please enter valid Option");
             }
-        }while (jobStatus == "");
+        } while (jobStatus == "");
 
 
         System.out.print("Please write your Email: ");
         email = scanner.nextLine();
         if (currentCustomer != null)
-            System.out.println("New customer account created, context switched to new customer with afm: "+afm);
+            System.out.println("New customer account created, context switched to new customer with afm: " + afm);
         currentCustomer = new Customer(afm, id, address, jobStatus, email);
         customers.add(currentCustomer);
     }
@@ -104,8 +106,8 @@ public class Controller {
     @constraint No 2 contracts can overlap in date if they are on the same phone number
     @constraint Home phone numbers can only have home contracts and vice versa for mobile (check 2 or 6 for number)
     */
-    private void newContract(){
-        if (currentCustomer == null){
+    private void newContract() {
+        if (currentCustomer == null) {
             System.err.println("No customer is logged in, exiting action");
             return;
         }
@@ -121,7 +123,7 @@ public class Controller {
             contract = new HomeContract();
         else if (choice == 2)
             contract = new MobileContract();
-        else{
+        else {
             System.out.println("Invalid input");
             return;
         }
@@ -132,40 +134,99 @@ public class Controller {
         else {
             System.out.println("Contract created successfully, adding to account");
             currentCustomer.addContract(contract);
+            contract.calculateDiscount(currentCustomer);
             contract.printContract();
         }
     }
 
-    private void deleteContract(){
-        if (currentCustomer == null){
+    private void deleteContract() {
+        if (currentCustomer == null) {
             System.err.println("No customer is logged in, exiting action");
             return;
         }
-        if (currentCustomer.getContracts().size() == 0){
+        if (currentCustomer.getContracts().size() == 0) {
             System.err.println("No contracts associated with this account");
             return;
         }
         int i = 1;
         System.out.println("Contracts associated with this account:");
-        for (Contract c : currentCustomer.getContracts()){
+        for (Contract c : currentCustomer.getContracts()) {
             System.out.println(i + ")");
             c.printCondensed();
+            i++;
         }
+
         System.out.println("Select the contract you want to delete");
         Scanner scanner = new Scanner(System.in);
         String input = scanner.nextLine();
-        int index = Integer.parseInt(input);
+        int index = Integer.parseInt(input)-1;
 
-        if (index < currentCustomer.getContracts().size() && index>= 0){
+        if (index < currentCustomer.getContracts().size() && index >= 0) {
             Contract.staticContractIds.remove(currentCustomer.getContracts().get(index));
             currentCustomer.getContracts().remove(currentCustomer.getContracts().get(index));
-        }
-        else
+            System.out.println("Contract deleted successfully");
+        } else
             System.err.println("Wrong input, index out of bounds");
-    }
 
-    private void showStatistics(){
 
     }
 
+    private void showStatistics() {
+        if (customers.size() == 0) {
+            System.err.println("No customer data available");
+            return;
+        }
+        double minCall, maxCall, meanCall;
+        int contracts;
+
+        minCall = maxCall = meanCall = contracts = 0;
+        //HOME
+        for (Customer c : customers)
+            for (Contract con : c.getContracts())
+                if (con.type == ContractType.HOME) {
+                    minCall = Math.min(minCall, con.getMonthlyCost());
+                    maxCall = Math.max(maxCall, con.getMonthlyCost());
+                    meanCall += con.getMonthlyCost();
+                    contracts++;
+                }
+        meanCall = contracts > 0 ? meanCall / contracts : 0;
+        System.out.println("------------------------------------");
+        System.out.println("HOME CONTRACTS\n\t MIN CALL\t MAX CALL\t MEAN CALL");
+        System.out.printf("\t\t %.2f \t\t %.2f \t\t %.2f\n", minCall, maxCall, meanCall);
+
+        minCall = maxCall = meanCall = contracts = 0;
+
+        for (Customer c : customers)
+            for (Contract con : c.getContracts())
+                if (con.type == ContractType.MOBILE) {
+                    minCall = Math.min(minCall, con.getMonthlyCost());
+                    maxCall = Math.max(maxCall, con.getMonthlyCost());
+                    meanCall += con.getMonthlyCost();
+                    contracts++;
+                }
+        meanCall = contracts > 0 ? meanCall / contracts : 0;
+        System.out.println("MOBILE CONTRACTS\n\t MIN CALL\t MAX CALL\t MEAN CALL");
+        System.out.printf("\t\t %.2f \t\t %.2f \t\t %.2f\n", minCall, maxCall, meanCall);
+
+        System.out.println("Please enter your AFM to see your active contracts:");
+        Scanner scanner = new Scanner(System.in);
+        String input = scanner.nextLine();
+        Customer tempCustomer;
+        if (customers.stream().anyMatch(cust -> cust.getAFM().equals(input)))
+            tempCustomer = customers.stream()
+                    .filter(cust -> cust.getAFM().equals(input)).findFirst().get();
+        else {
+            System.err.println("No such AFM found in customer database");
+            return;
+        }
+
+        ArrayList<Contract> activeContracts = tempCustomer.getActiveContracts();
+
+        if (activeContracts.size() == 0){
+            System.err.println("No active contracts found");
+            return;
+        }
+        //Show details for every active contract
+        activeContracts.forEach(Contract::printContract);
+    }
 }
