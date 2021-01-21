@@ -1,5 +1,6 @@
 package core;
 
+import java.time.LocalDate;
 import java.util.Scanner;
 
 public class MobileContract extends Contract {
@@ -9,13 +10,30 @@ public class MobileContract extends Contract {
     public MobileContract() {
         super();
     }
+    public MobileContract(String contractId, String phoneNUmber, ContractType type, String customerAFM
+            , String customerID, int freeCallMinutes, LocalDate startDate, LocalDate endDate, int contractDuration
+            , boolean electronic, PaymentType paymentType, double freeData, int freeSMS, Customer customer){
+        this.contractId = contractId;
+        this.phoneNumber = phoneNUmber;
+        this.type = type;
+        this.customerAFM = customerAFM;
+        this.customerID = customerID;
+        this.freeCallMinutes = freeCallMinutes;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.contractDuration = contractDuration;
+        this.electronic = electronic;
+        this.paymentType = paymentType;
+        this.freeData = freeData;
+        this.freeSMS = freeSMS;
+    }
 
     @Override
     public double calculateCost() {
         double cost = 0.54 * freeCallMinutes / 3;
         cost += 0.23 * freeSMS / 2;
 
-        return (cost/100) * 100-discount;
+        return (cost/100) * 100- discountPercentage;
     }
 
     @Override
@@ -68,6 +86,6 @@ public class MobileContract extends Contract {
                         Discount: %d%%
                         %n""", contractId, phoneNumber, customerID, customerAFM,
                 type, freeCallMinutes, freeData, freeSMS, startDate.toString(), endDate.toString(),
-                electronic, paymentType, monthlyCost, discount);
+                electronic, paymentType, monthlyCost, discountPercentage);
     }
 }

@@ -23,7 +23,7 @@ public abstract class Contract {
 
     protected boolean internetConnection;
 
-    protected int discount;
+    protected int discountPercentage;
 
     public abstract double calculateCost();
 
@@ -135,10 +135,12 @@ public abstract class Contract {
     Generate a unique id for every contract
     @HashSet guarantees no duplicates
     */
-    public String getUniqueId() {
-        String uid = null;
-        while (uid == null || staticContractIds.contains(uid))
+    public static String getUniqueId() {
+        String uid;
+        do
             uid = UUID.randomUUID().toString();
+        while (staticContractIds.contains(uid));
+
         return uid;
     }
 
@@ -166,30 +168,30 @@ public abstract class Contract {
     }
 
     public void calculateDiscount(Customer customer) {
-        discount = 0;
+        discountPercentage = 0;
         ArrayList<Contract> activeContracts = customer.getActiveContracts();
         //JOB STATUS
         if (customer.getJobStatus().equals("Private Citizen"))
-            discount += 5 * activeContracts.size();
+            discountPercentage += 5 * activeContracts.size();
         else if (customer.getJobStatus().equals("Professional"))
-            discount += 10 * activeContracts.size();
+            discountPercentage += 10 * activeContracts.size();
         else
-            discount += 15 * activeContracts.size();
+            discountPercentage += 15 * activeContracts.size();
 
         //Check if any contract above 1000 minutes and depending on type
         if (customer.getContracts().stream().anyMatch(c -> c.freeCallMinutes >= 1000))
             if (type == ContractType.HOME)
-                discount += 8;
+                discountPercentage += 8;
             else
-                discount += 11;
+                discountPercentage += 11;
         if (paymentType == PaymentType.CREDITCARD || paymentType == PaymentType.STANDING_ORDER)
-            discount += 5;
+            discountPercentage += 5;
 
         //If account is electronic
         if (electronic)
-            discount += 2;
+            discountPercentage += 2;
 
         //Limit the max value of discount at 45
-        discount = Math.min(discount, 45);
+        discountPercentage = Math.min(discountPercentage, 45);
     }
 }

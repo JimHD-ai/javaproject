@@ -1,5 +1,6 @@
 package core;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 
 import java.util.Scanner;
@@ -13,9 +14,29 @@ public class Controller {
         customers = new ArrayList<>();
     }
 
+    /*
+    This method will create customers and contracts so the program can be tested
+    */
+    public void initializeForTesting(){
+        System.out.println("Starting system initialization");
+        customers.add(new Customer("010101", "AI141516", "Egnatia 115", "Professional", "itookapillinibiza@gmail.com"));
+        customers.add(new Customer("020202", "AK120519", "Adrianoupoleos 14", "Student", "aviciithoughtIwasCool@hotmail.com"));
+        customers.add(new Customer("030303", "AI452030", "Skepastou 5", "Private Citizen", "finallygotolder@gmail.com"));
+        customers.add(new Customer("040404", "AI214175", "Papazoli 7", "Private Citizen", "waytooold@yahoo.gr"));
+
+        for (Customer cust : customers){
+            HomeContract contract = new HomeContract(Contract.getUniqueId(), "6982093612", ContractType.HOME, cust.getAFM()
+            , cust.getID(), 150, LocalDate.now(), LocalDate.now().plusMonths(12),
+                    12, true, PaymentType.CREDITCARD,true, "VDSL", cust);
+
+            cust.addContract(contract);
+            contract.printContract();
+            break;
+        }
+    }
     public void begin() {
-        currentCustomer = new Customer("FA89", "AI816966", "Sapfous 11", "Student", "shadehater@hotmail.com");
-        customers.add(currentCustomer);
+        initializeForTesting();
+
         Scanner scanner = new Scanner(System.in);
         System.out.println("Welcome to JavaPhone Telecom");
 
@@ -184,9 +205,9 @@ public class Controller {
         for (Customer c : customers)
             for (Contract con : c.getContracts())
                 if (con.type == ContractType.HOME) {
-                    minCall = Math.min(minCall, con.getMonthlyCost());
-                    maxCall = Math.max(maxCall, con.getMonthlyCost());
-                    meanCall += con.getMonthlyCost();
+                    minCall = Math.min(minCall, con.freeCallMinutes);
+                    maxCall = Math.max(maxCall, con.freeCallMinutes);
+                    meanCall += con.freeCallMinutes;
                     contracts++;
                 }
         meanCall = contracts > 0 ? meanCall / contracts : 0;
@@ -199,9 +220,9 @@ public class Controller {
         for (Customer c : customers)
             for (Contract con : c.getContracts())
                 if (con.type == ContractType.MOBILE) {
-                    minCall = Math.min(minCall, con.getMonthlyCost());
-                    maxCall = Math.max(maxCall, con.getMonthlyCost());
-                    meanCall += con.getMonthlyCost();
+                    minCall = Math.min(minCall, con.freeCallMinutes);
+                    maxCall = Math.max(maxCall, con.freeCallMinutes);
+                    meanCall += con.freeCallMinutes;
                     contracts++;
                 }
         meanCall = contracts > 0 ? meanCall / contracts : 0;

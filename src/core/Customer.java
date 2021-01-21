@@ -5,12 +5,11 @@ import java.util.ArrayList;
 import java.util.stream.Collectors;
 
 public class Customer {
-
-    private String afm;
-    private String id;
-    private String address;
-    private String jobStatus;
-    private String email;
+    private final String afm;
+    private final String id;
+    private final String address;
+    private final String jobStatus;
+    private final String email;
 
     private final ArrayList<Contract> contracts;
 
@@ -20,7 +19,6 @@ public class Customer {
         this.address = address;
         this.jobStatus = jobStatus;
         this.email = email;
-
         contracts = new ArrayList<>();
     }
 
@@ -35,7 +33,6 @@ public class Customer {
 
     public ArrayList<Contract> getContracts() { return contracts; }
     public void addContract(Contract contract) { contracts.add(contract); }
-
     /*
         Returns an ArrayList with the currently active contracts
         A contract is active if its start date is before the current local date
@@ -43,8 +40,7 @@ public class Customer {
     */
     public ArrayList<Contract> getActiveContracts() {
         return contracts.stream()
-                .filter(c -> c.startDate.isBefore(LocalDate.now()))
+                .filter(c -> c.startDate.isBefore(LocalDate.now()) || c.startDate.isEqual(LocalDate.now()))
                 .collect(Collectors.toCollection(ArrayList::new));
     }
-
 }
