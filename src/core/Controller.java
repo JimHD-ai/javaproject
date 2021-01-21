@@ -17,23 +17,56 @@ public class Controller {
     /*
     This method will create customers and contracts so the program can be tested
     */
-    public void initializeForTesting(){
+    public void initializeForTesting() {
         System.out.println("Starting system initialization");
         customers.add(new Customer("010101", "AI141516", "Egnatia 115", "Professional", "itookapillinibiza@gmail.com"));
         customers.add(new Customer("020202", "AK120519", "Adrianoupoleos 14", "Student", "aviciithoughtIwasCool@hotmail.com"));
         customers.add(new Customer("030303", "AI452030", "Skepastou 5", "Private Citizen", "finallygotolder@gmail.com"));
         customers.add(new Customer("040404", "AI214175", "Papazoli 7", "Private Citizen", "waytooold@yahoo.gr"));
 
-        for (Customer cust : customers){
-            HomeContract contract = new HomeContract(Contract.getUniqueId(), "6982093612", ContractType.HOME, cust.getAFM()
-            , cust.getID(), 150, LocalDate.now(), LocalDate.now().plusMonths(12),
-                    12, true, PaymentType.CREDITCARD,true, "VDSL", cust);
+        Contract contract;
 
-            cust.addContract(contract);
-            contract.printContract();
-            break;
-        }
+        //CUSTOMER 1
+        currentCustomer = customers.get(0);
+        contract = new HomeContract(Contract.getUniqueId(), "2331032543", ContractType.HOME, currentCustomer.getAFM()
+                , currentCustomer.getID(), 150, LocalDate.now(), LocalDate.now().plusMonths(12),
+                12, true, PaymentType.CREDITCARD, true, "VDSL", currentCustomer);
+        currentCustomer.addContract(contract);
+        contract = new MobileContract(Contract.getUniqueId(), "6989371422", ContractType.MOBILE, currentCustomer.getAFM(),
+                currentCustomer.getID(), 1500, LocalDate.now(), LocalDate.now().plusMonths(24), 24, true,
+                true, PaymentType.CREDITCARD, 5, 100, currentCustomer);
+        currentCustomer.addContract(contract);
+
+        //CUSTOMER 2
+        currentCustomer = customers.get(1);
+        contract = new MobileContract(Contract.getUniqueId(), "6989371422", ContractType.MOBILE, currentCustomer.getAFM(),
+                currentCustomer.getID(), 400, LocalDate.now().plusDays(5), LocalDate.now().plusMonths(24), 24, false,
+                true, PaymentType.CREDITCARD, 5, 100, currentCustomer);
+        currentCustomer.addContract(contract);
+
+        //CUSTOMER 3
+        currentCustomer = customers.get(2);
+        contract = new HomeContract(Contract.getUniqueId(), "2102045350", ContractType.HOME, currentCustomer.getAFM()
+                , currentCustomer.getID(), 20000, LocalDate.now(), LocalDate.now().plusMonths(12),
+                12, false, PaymentType.CREDITCARD, false, null, currentCustomer);
+        currentCustomer.addContract(contract);
+        contract = new HomeContract(Contract.getUniqueId(), "2102045350", ContractType.HOME, currentCustomer.getAFM()
+                , currentCustomer.getID(), 150, LocalDate.now().plusMonths(24), LocalDate.now().plusMonths(24).plusMonths(24),
+                24, false, PaymentType.CREDITCARD, false, "None", currentCustomer);
+        currentCustomer.addContract(contract);
+
+        //CUSTOMER 4
+        currentCustomer = customers.get(3);
+        contract = new MobileContract(Contract.getUniqueId(), "6972152830", ContractType.MOBILE, currentCustomer.getAFM(),
+                currentCustomer.getID(), 1000, LocalDate.now(), LocalDate.now().plusMonths(24), 24,
+                true, true, PaymentType.STANDING_ORDER, 10, 0, currentCustomer);
+        currentCustomer.addContract(contract);
+        contract = new MobileContract(Contract.getUniqueId(), "6931405060", ContractType.MOBILE, currentCustomer.getAFM(),
+                currentCustomer.getID(), 50, LocalDate.now(), LocalDate.now().plusMonths(12), 12,
+                false, false, PaymentType.STANDING_ORDER, 0, 220, currentCustomer);
+        currentCustomer.addContract(contract);
     }
+
     public void begin() {
         initializeForTesting();
 
@@ -160,6 +193,14 @@ public class Controller {
         }
     }
 
+    /*
+    @use Deletes a contract
+    @constraint a customer can only delete his own contracts
+    In order to fully delete a contract, its unique id must be removed
+    from the idSet and the customer's contracts arraylist
+
+    The contract to be deleted is selected from the user
+    */
     private void deleteContract() {
         if (currentCustomer == null) {
             System.err.println("No customer is logged in, exiting action");
@@ -172,24 +213,28 @@ public class Controller {
         int i = 1;
         System.out.println("Contracts associated with this account:");
         for (Contract c : currentCustomer.getContracts()) {
-            System.out.println(i + ")");
+            System.out.print(i + ")");
             c.printCondensed();
             i++;
+            System.out.println();
         }
 
-        System.out.println("Select the contract you want to delete");
+        System.out.print("Select the contract you want to delete: ");
         Scanner scanner = new Scanner(System.in);
         String input = scanner.nextLine();
-        int index = Integer.parseInt(input)-1;
+        System.out.println();
+        int index = Integer.parseInt(input) - 1;
 
+        /*
+        Gets the contract from the user's input, removes its id from the staticSet and the customer's arraylist
+        */
         if (index < currentCustomer.getContracts().size() && index >= 0) {
-            Contract.staticContractIds.remove(currentCustomer.getContracts().get(index));
-            currentCustomer.getContracts().remove(currentCustomer.getContracts().get(index));
+            Contract contractToBeDeleted = currentCustomer.getContracts().get(index);
+            Contract.staticContractIds.remove(contractToBeDeleted.contractId);
+            currentCustomer.getContracts().remove(contractToBeDeleted);
             System.out.println("Contract deleted successfully");
         } else
             System.err.println("Wrong input, index out of bounds");
-
-
     }
 
     private void showStatistics() {
@@ -200,7 +245,8 @@ public class Controller {
         double minCall, maxCall, meanCall;
         int contracts;
 
-        minCall = maxCall = meanCall = contracts = 0;
+        minCall = Integer.MAX_VALUE;
+        maxCall = meanCall = contracts = 0;
         //HOME
         for (Customer c : customers)
             for (Contract con : c.getContracts())
@@ -211,12 +257,13 @@ public class Controller {
                     contracts++;
                 }
         meanCall = contracts > 0 ? meanCall / contracts : 0;
+        minCall = minCall == Integer.MAX_VALUE ? 0 : minCall;
         System.out.println("------------------------------------");
         System.out.println("HOME CONTRACTS\n\t MIN CALL\t MAX CALL\t MEAN CALL");
         System.out.printf("\t\t %.2f \t\t %.2f \t\t %.2f\n", minCall, maxCall, meanCall);
 
-        minCall = maxCall = meanCall = contracts = 0;
-
+        minCall = Integer.MAX_VALUE;
+        maxCall = meanCall = contracts = 0;
         for (Customer c : customers)
             for (Contract con : c.getContracts())
                 if (con.type == ContractType.MOBILE) {
@@ -226,6 +273,8 @@ public class Controller {
                     contracts++;
                 }
         meanCall = contracts > 0 ? meanCall / contracts : 0;
+        minCall = minCall == Integer.MAX_VALUE ? 0 : minCall;
+
         System.out.println("MOBILE CONTRACTS\n\t MIN CALL\t MAX CALL\t MEAN CALL");
         System.out.printf("\t\t %.2f \t\t %.2f \t\t %.2f\n", minCall, maxCall, meanCall);
 
@@ -243,7 +292,7 @@ public class Controller {
 
         ArrayList<Contract> activeContracts = tempCustomer.getActiveContracts();
 
-        if (activeContracts.size() == 0){
+        if (activeContracts.size() == 0) {
             System.err.println("No active contracts found");
             return;
         }

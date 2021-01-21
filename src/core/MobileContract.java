@@ -12,7 +12,7 @@ public class MobileContract extends Contract {
     }
     public MobileContract(String contractId, String phoneNUmber, ContractType type, String customerAFM
             , String customerID, int freeCallMinutes, LocalDate startDate, LocalDate endDate, int contractDuration
-            , boolean electronic, PaymentType paymentType, double freeData, int freeSMS, Customer customer){
+            , boolean electronic, boolean internetConnection, PaymentType paymentType, double freeData, int freeSMS, Customer customer){
         this.contractId = contractId;
         this.phoneNumber = phoneNUmber;
         this.type = type;
@@ -26,6 +26,11 @@ public class MobileContract extends Contract {
         this.paymentType = paymentType;
         this.freeData = freeData;
         this.freeSMS = freeSMS;
+        this.internetConnection = internetConnection;
+
+        calculateDiscount(customer);
+        monthlyCost = calculateCost();
+        staticContractIds.add(contractId);
     }
 
     @Override
@@ -76,7 +81,7 @@ public class MobileContract extends Contract {
                         CONTRACT DETAILS
                         Contract type: %s
                         Call minutes: %d
-                        Internet Data: %.1f
+                        Internet Data: %.1f GB
                         SMS: %d
                         START DATE: %s
                         END DATE: %s

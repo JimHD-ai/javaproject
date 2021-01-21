@@ -26,14 +26,17 @@ public class HomeContract extends Contract {
         this.paymentType = paymentType;
         this.connectionSpeed = connectionSpeed;
         this.internetConnection = internetConnection;
+
         calculateDiscount(customer);
-        calculateCost();
+        monthlyCost = calculateCost();
+        staticContractIds.add(contractId);
     }
 
     @Override
     public double calculateCost() {
         double cost = 0.45 * freeCallMinutes / 3;
-        cost += connectionSpeed.equals("ADSL") ? 18.69 : 31.9; //taken straight from COSMOTE
+        if(internetConnection)
+            cost += connectionSpeed.equals("ADSL") ? 18.69 : 31.9; //taken straight from COSMOTE
 
         return (cost/100) * 100- discountPercentage;
     }
